@@ -7,10 +7,8 @@ function getTotalAccountsCount(accounts) {
 }
 
 function getBooksBorrowedCount(books) {
-  const booksFunc = require("./books");
-  const seperateBooks = booksFunc.partitionBooksByBorrowedStatus;
-  const bookArrays = seperateBooks(books);
-  return bookArrays[0].length;
+  const booksBorrowed = books.filter((book)=> !book.borrows[0].returned);
+  return booksBorrowed.length;
 }
 
 function getMostCommonGenres(books) {
@@ -43,8 +41,6 @@ function authorsRealName({name:{first, last}}){// deconstruction, additional fun
 
 function getMostPopularAuthors(books, authors) {
   let result =[];
-  const bookFunc = require("./books");
-  const findAuthor = bookFunc.findAuthorById;
   const booksByAuthor = books.map((book)=> {//map, arrow function
     return ({id : book.authorId, count : book.borrows.length });// object shorthand
   });
@@ -53,7 +49,7 @@ function getMostPopularAuthors(books, authors) {
     return acc;
   }, {});
   for(let authorID in authorCount){//for/in loop
-    const person = findAuthor(authors, authorID);
+    const person = authors.find((author)=> author.id == authorID);
     const name = authorsRealName(person);
     const count = authorCount[authorID];
     result.push({name: name, count: count});//object shorthand
